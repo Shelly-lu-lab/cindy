@@ -1480,6 +1480,11 @@
     }
   },
   "settings": {
+    "conversation": {
+      "open": "Chat in New Window",
+      "hint": "Place the chat window beside Settings to follow the steps as you configure.",
+      "openFailed": "Could not open the chat window. Please try again."
+    },
     "title": "Settings",
     "search": {
       "ariaLabel": "Search settings",

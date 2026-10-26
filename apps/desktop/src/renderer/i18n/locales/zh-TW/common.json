@@ -1451,6 +1451,11 @@
     }
   },
   "settings": {
+    "conversation": {
+      "open": "在新視窗查看對話",
+      "hint": "將對話視窗與設定並排放置，邊看步驟邊設定。",
+      "openFailed": "無法開啟對話視窗，請重試。"
+    },
     "title": "設定",
     "search": {
       "ariaLabel": "搜尋設定",

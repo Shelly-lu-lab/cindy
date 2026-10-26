@@ -1451,6 +1451,11 @@
     }
   },
   "settings": {
+    "conversation": {
+      "open": "새 창에서 대화 보기",
+      "hint": "대화 창과 설정을 나란히 놓고 단계를 확인하며 설정하세요.",
+      "openFailed": "대화 창을 열 수 없습니다. 다시 시도해 주세요."
+    },
     "title": "설정",
     "search": {
       "ariaLabel": "설정 검색",

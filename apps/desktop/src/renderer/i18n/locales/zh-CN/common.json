@@ -1451,6 +1451,11 @@
     }
   },
   "settings": {
+    "conversation": {
+      "open": "在新窗口查看对话",
+      "hint": "将对话窗口与设置并排放置，边看步骤边配置。",
+      "openFailed": "无法打开对话窗口，请重试。"
+    },
     "title": "设置",
     "search": {
       "ariaLabel": "搜索设置",
