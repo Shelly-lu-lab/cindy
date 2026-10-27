@@ -17,6 +17,12 @@ vi.mock('@/features/device-link/stickySessionOrigin', () => ({
   getStickySessionDeviceId: (id: string) => id === 'remote-task' ? 'remembered-device' : undefined,
 }));
 vi.mock('@/lib/toast', () => ({ toast: { error: vi.fn() } }));
+vi.mock('@/features/bots/useRemoteBots', () => ({
+  useRemoteBots: () => [
+    { id: 'bot-a', deviceId: 'other-device', sessionId: 'wrong-chat' },
+    { id: 'bot-a', deviceId: 'remote-a', sessionId: 'remote-chat' },
+  ],
+}));
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
@@ -199,6 +205,8 @@ describe('SettingsView conversation reference', () => {
     ['/cc-agent/task-a?device=remote-a', 'task-a', 'remote-a'],
     ['/cc-agent/remote-task', 'remote-task', 'remembered-device'],
     ['/bots/bot-a/session/chat-a', 'chat-a', undefined],
+    // PR #7274: normal sidebar routes omit the session; match both bot and device.
+    ['/bots/remote/remote-a/bot-a', 'remote-chat', 'remote-a'],
     ['/bots/remote/remote-a/bot-a/session/chat-a', 'chat-a', 'remote-a'],
   ])('opens the originating conversation and keeps the settings route: %s', async (entry, sessionId, deviceId) => {
     const open = vi.fn().mockResolvedValue(undefined);
@@ -210,7 +218,7 @@ describe('SettingsView conversation reference', () => {
     expect(screen.getByRole('button', { name: 'Ask help' })).toBeTruthy();
   });
 
-  it.each(['/settings', '/cc-agent/new', '/cc-agent/scheduled', '/bots/roster'])('does not offer a non-conversation target: %s', (entry) => {
+  it.each(['/settings', '/cc-agent/new', '/cc-agent/scheduled', '/bots/roster', '/bots/remote/unknown-device/bot-a'])('does not offer a non-conversation target: %s', (entry) => {
     window.electronAPI.maker = { openSessionInNewWindow: vi.fn() } as unknown as typeof window.electronAPI.maker;
     renderReference(entry);
     expect(screen.queryByRole('button', { name: label })).toBeNull();

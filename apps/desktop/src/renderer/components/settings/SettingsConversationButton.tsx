@@ -5,6 +5,7 @@ import { PanelsTopLeft } from 'lucide-react';
 
 import { MainViewHistoryContext } from '@/contexts/MainViewHistoryContext';
 import { getStickySessionDeviceId } from '@/features/device-link/stickySessionOrigin';
+import { useRemoteBots } from '@/features/bots/useRemoteBots';
 import { resolveAgentIslandVisibleSessionIdFromPath } from '@/lib/agentIslandVisibleSessionRoute';
 import { createLogger } from '@/lib/logger';
 import { toast } from '@/lib/toast';
@@ -16,20 +17,24 @@ const log = createLogger('SettingsConversationButton');
 /** Reuse account-scoped navigation history; never persist a second task pointer. */
 export function SettingsConversationButton() {
   const history = useContext(MainViewHistoryContext);
+  const remoteBots = useRemoteBots();
   const { t } = useTranslation();
   const [opening, setOpening] = useState(false);
   const openingRef = useRef(false);
   const view = history?.current.lastMatchedKey;
   const path = view === 'cc-agent' || view === 'bots' ? history?.current.paths[view] : undefined;
   const url = path ? new URL(path, 'https://cindy.invalid') : null;
-  const remoteBotMatch = url && matchPath('/bots/remote/:deviceId/:botId/session/:sessionId', url.pathname);
+  const remoteSessionMatch = url && matchPath('/bots/remote/:deviceId/:botId/session/:sessionId', url.pathname);
+  const remoteBotMatch = remoteSessionMatch ?? (url && matchPath('/bots/remote/:deviceId/:botId', url.pathname));
   const botMatch = url && (
     matchPath('/bots/:botId/session/:sessionId', url.pathname) ??
     matchPath('/bots/:botId/history/:sessionId', url.pathname) ??
-    remoteBotMatch
+    remoteSessionMatch
   );
   const sessionId = url
     ? resolveAgentIslandVisibleSessionIdFromPath(url.pathname) ?? botMatch?.params.sessionId
+      ?? (remoteBotMatch ? remoteBots.find((bot) =>
+        bot.deviceId === remoteBotMatch.params.deviceId && bot.id === remoteBotMatch.params.botId)?.sessionId : null)
     : null;
   // Freeze the originating device before opening another renderer. The sticky
   // resolver preserves it while a remote mirror is temporarily reconnecting.

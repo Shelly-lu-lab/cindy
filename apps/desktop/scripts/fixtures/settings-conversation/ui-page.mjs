@@ -7,6 +7,8 @@ export default {
   real: 'SettingsConversationButton, SettingsSidebarNav, Button, Tip and theme tokens',
   notCovered: 'Full SettingsView, native window creation, actual task contents and remote device connection',
   stubs: {
+    'src/renderer/features/bots/useRemoteBots':
+      'export const useRemoteBots = () => [];',
     'src/renderer/components/settings/settingsSearchCatalog':
       'export const buildSettingsSearchDocuments = () => []; export const searchSettings = () => [];',
     'src/renderer/features/device-link/stickySessionOrigin':
