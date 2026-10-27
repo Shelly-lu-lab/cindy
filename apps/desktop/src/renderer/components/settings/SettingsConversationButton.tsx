@@ -33,8 +33,10 @@ export function SettingsConversationButton() {
   );
   const sessionId = url
     ? resolveAgentIslandVisibleSessionIdFromPath(url.pathname) ?? botMatch?.params.sessionId
+      // Offline companion pages may display cloud history. A cached session ID
+      // cannot open that history through the device-link session window.
       ?? (remoteBotMatch ? remoteBots.find((bot) =>
-        bot.deviceId === remoteBotMatch.params.deviceId && bot.id === remoteBotMatch.params.botId)?.sessionId : null)
+        bot.online && bot.deviceId === remoteBotMatch.params.deviceId && bot.id === remoteBotMatch.params.botId)?.sessionId : null)
     : null;
   // Freeze the originating device before opening another renderer. The sticky
   // resolver preserves it while a remote mirror is temporarily reconnecting.

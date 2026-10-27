@@ -19,8 +19,9 @@ vi.mock('@/features/device-link/stickySessionOrigin', () => ({
 vi.mock('@/lib/toast', () => ({ toast: { error: vi.fn() } }));
 vi.mock('@/features/bots/useRemoteBots', () => ({
   useRemoteBots: () => [
-    { id: 'bot-a', deviceId: 'other-device', sessionId: 'wrong-chat' },
-    { id: 'bot-a', deviceId: 'remote-a', sessionId: 'remote-chat' },
+    { id: 'bot-a', deviceId: 'other-device', sessionId: 'wrong-chat', online: true },
+    { id: 'bot-a', deviceId: 'remote-a', sessionId: 'remote-chat', online: true },
+    { id: 'bot-a', deviceId: 'offline-device', sessionId: 'cached-chat', online: false },
   ],
 }));
 
@@ -230,6 +231,17 @@ describe('SettingsView conversation reference', () => {
     expect(screen.getByRole('button', { name: label })).toBeTruthy();
     app.changeOwner();
     expect(screen.queryByRole('button', { name: label })).toBeNull();
+  });
+
+  // PR #7274 review: an offline cloud chat retains a cached session ID, but a
+  // new device-link session window cannot display that cloud conversation.
+  it('does not offer an offline cached companion session as a window target', () => {
+    const open = vi.fn();
+    window.electronAPI.maker = { openSessionInNewWindow: open } as unknown as typeof window.electronAPI.maker;
+    renderReference('/bots/remote/offline-device/bot-a');
+    expect(screen.queryByRole('button', { name: label })).toBeNull();
+    expect(open).not.toHaveBeenCalled();
+    expect(location()).toBe('/settings?tab=help');
   });
 
   it('prevents duplicate opens and allows retry after failure without leaving settings', async () => {
